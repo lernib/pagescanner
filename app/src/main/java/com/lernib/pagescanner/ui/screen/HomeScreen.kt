@@ -20,7 +20,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.lernib.pagescanner.ui.HomeNavigation
+import com.lernib.pagescanner.ui.NavScreen
+import com.lernib.pagescanner.ui.Navigation
+
+enum class HomeNavigation : Navigation {
+    CAMERA;
+
+    override fun toNavScreen(): NavScreen {
+        return when(this) {
+            CAMERA -> NavScreen.Camera
+        }
+    }
+}
 
 data class HomeScreenProps(
     val onNavigate: (HomeNavigation) -> Unit

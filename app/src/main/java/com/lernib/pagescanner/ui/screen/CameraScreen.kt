@@ -1,11 +1,7 @@
 package com.lernib.pagescanner.ui.screen
 
-import android.content.Context
-import android.icu.text.SimpleDateFormat
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.CameraSelector
+import android.graphics.Bitmap
+import android.util.Log
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,20 +14,24 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
-import com.lernib.pagescanner.ui.CameraNavigation
+import com.lernib.pagescanner.ui.NavScreen
+import com.lernib.pagescanner.ui.Navigation
 import com.lernib.pagescanner.ui.component.camera.CameraPreview
 import com.lernib.pagescanner.ui.component.camera.CameraPreviewProps
-import java.io.File
-import java.util.Date
-import java.util.Objects
+
+sealed class CameraNavigation : Navigation {
+    data class ProcessImage(val bitmap: Bitmap) : CameraNavigation()
+
+    override fun toNavScreen(): NavScreen {
+        return when(this) {
+            is ProcessImage -> NavScreen.ProcessImage(bitmap)
+        }
+    }
+}
 
 data class CameraScreenProps(
     val onNavigate: (CameraNavigation) -> Unit
@@ -40,21 +40,6 @@ data class CameraScreenProps(
 @Composable
 fun CameraScreen(props: CameraScreenProps) {
     val context = LocalContext.current
-    val file = context.createImageFile()
-    val uri = FileProvider.getUriForFile(
-        Objects.requireNonNull(context),
-        context.packageName + ".provider", file
-    )
-
-    var capturedImageUri by remember {
-        mutableStateOf<Uri>(Uri.EMPTY)
-    }
-
-    val cameraLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-            capturedImageUri = uri
-        }
-
     val previewView = remember {
         PreviewView(context)
     }
@@ -74,9 +59,12 @@ fun CameraScreen(props: CameraScreenProps) {
                 Spacer(modifier = Modifier.weight(1f))
                 LargeFloatingActionButton(
                     onClick = {
-                        // TODO Take photo as soon as screen is opened
-                        cameraLauncher.launch(uri)
-                        props.onNavigate.invoke(CameraNavigation.CUSTOMIZE)
+                        val bitmap = previewView.bitmap
+
+                        if (bitmap != null)
+                            props.onNavigate.invoke(CameraNavigation.ProcessImage(bitmap))
+
+                        Log.i("lernib", "Bitmap is null")
                     },
                     modifier = Modifier
                         .size(75.dp)
@@ -90,15 +78,4 @@ fun CameraScreen(props: CameraScreenProps) {
             }
         }
     }
-}
-
-fun Context.createImageFile(): File {
-    // Create an image file name
-    val timeStamp = SimpleDateFormat.getDateTimeInstance().format(Date())
-    val imageFileName = "JPEG_" + timeStamp + "_"
-    return File.createTempFile(
-        imageFileName, /* prefix */
-        ".jpg", /* suffix */
-        externalCacheDir      /* directory */
-    )
 }
