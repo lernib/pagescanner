@@ -13,6 +13,8 @@ import com.lernib.pagescanner.ui.screen.CameraScreen
 import com.lernib.pagescanner.ui.screen.CameraScreenProps
 import com.lernib.pagescanner.ui.screen.HomeScreen
 import com.lernib.pagescanner.ui.screen.HomeScreenProps
+import com.lernib.pagescanner.ui.screen.ProcessImageScreen
+import com.lernib.pagescanner.ui.screen.ProcessImageScreenProps
 
 @Composable
 fun NavigationComposable() {
@@ -58,7 +60,19 @@ fun NavigationComposable() {
         }
 
         composable(NavScreen.ProcessImage.NAVIGATION_CODE) {
-            Text(text = "Hello customize!")
+            if (navScreen is NavScreen.ProcessImage) {
+                val props = ProcessImageScreenProps(
+                    bitmap = navScreen.bitmap,
+                    onNavigate = { next ->
+                        setNavScreen(next.toNavScreen())
+                        refreshNavScreen(next.toNavScreen())
+                    }
+                )
+
+                ProcessImageScreen(props)
+            } else {
+                Log.e("lernib", "Loading process image without valid navScreen")
+            }
         }
     }
 }
