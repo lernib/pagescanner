@@ -4,6 +4,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,10 @@ import com.lernib.pagescanner.ui.theme.PageScannerTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        onBackPressedDispatcher.addCallback(this,onBackPressedCallback)
+        requestCameraPermission()
+
         setContent {
             PageScannerTheme {
                 // A surface container using the 'background' color from the theme
@@ -29,8 +34,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
-        requestCameraPermission()
     }
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -58,6 +61,12 @@ class MainActivity : ComponentActivity() {
             ) -> Log.i("kilo", "Show camera permissions dialog")
 
             else -> requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+        }
+    }
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            Log.i("lernib", "Hit back")
         }
     }
 }
