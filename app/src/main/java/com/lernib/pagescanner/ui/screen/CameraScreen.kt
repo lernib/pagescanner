@@ -5,6 +5,8 @@ import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.CameraSelector
+import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import com.lernib.pagescanner.ui.CameraNavigation
 import com.lernib.pagescanner.ui.component.camera.CameraPreview
+import com.lernib.pagescanner.ui.component.camera.CameraPreviewProps
 import java.io.File
 import java.util.Date
 import java.util.Objects
@@ -52,8 +55,14 @@ fun CameraScreen(props: CameraScreenProps) {
             capturedImageUri = uri
         }
 
+    val previewView = remember {
+        PreviewView(context)
+    }
+
     Box {
-        CameraPreview()
+        CameraPreview(CameraPreviewProps(
+            previewView = previewView
+        ))
 
         Column(
             modifier = Modifier
