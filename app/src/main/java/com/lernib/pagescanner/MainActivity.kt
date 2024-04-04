@@ -12,8 +12,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.lernib.pagescanner.ui.screen.CameraScreen
-import com.lernib.pagescanner.ui.screen.HomeScreen
+import com.lernib.pagescanner.ui.Navigation
 import com.lernib.pagescanner.ui.theme.PageScannerTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,8 +25,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-//                    HomeScreen()
-                    CameraScreen()
+                    Navigation()
                 }
             }
         }
