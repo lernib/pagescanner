@@ -46,7 +46,7 @@ fun NavigationComposable() {
                 }
             )
 
-            CameraScreen(props)
+            CameraScreen.Screen(props)
         }
 
         is NavScreen.ProcessImage -> {
