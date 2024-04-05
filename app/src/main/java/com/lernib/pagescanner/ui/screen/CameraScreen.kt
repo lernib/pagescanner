@@ -24,16 +24,19 @@ import com.lernib.pagescanner.ui.component.camera.CameraPreview
 import com.lernib.pagescanner.ui.component.camera.CameraPreviewProps
 
 sealed class CameraNavigation : Navigation {
-    data class ProcessImage(val bitmap: Bitmap) : CameraNavigation()
+    data class ProcessImage(val scans: MutableList<Bitmap>) : CameraNavigation()
 
     override fun toNavScreen(): NavScreen {
         return when(this) {
-            is ProcessImage -> NavScreen.ProcessImage(bitmap)
+            is ProcessImage -> NavScreen.ProcessImage(
+                scans = scans
+            )
         }
     }
 }
 
 data class CameraScreenProps(
+    val scans: MutableList<Bitmap>,
     val onNavigate: (CameraNavigation) -> Unit
 )
 
@@ -61,8 +64,14 @@ fun CameraScreen(props: CameraScreenProps) {
                     onClick = {
                         val bitmap = previewView.bitmap
 
-                        if (bitmap != null)
-                            props.onNavigate.invoke(CameraNavigation.ProcessImage(bitmap))
+                        if (bitmap != null) {
+                            props.scans.add(bitmap)
+                            props.onNavigate.invoke(
+                                CameraNavigation.ProcessImage(
+                                    scans = props.scans
+                                )
+                            )
+                        }
 
                         Log.i("lernib", "Bitmap is null")
                     },

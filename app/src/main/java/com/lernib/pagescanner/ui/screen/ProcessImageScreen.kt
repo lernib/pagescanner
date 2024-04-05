@@ -17,18 +17,20 @@ import androidx.compose.ui.unit.dp
 import com.lernib.pagescanner.ui.NavScreen
 import com.lernib.pagescanner.ui.Navigation
 
-enum class ProcessImageNavigation : Navigation {
-    CAMERA;
+sealed class ProcessImageNavigation : Navigation {
+    data class Camera(val scans: MutableList<Bitmap>) : ProcessImageNavigation()
 
     override fun toNavScreen(): NavScreen {
         return when(this) {
-            CAMERA -> NavScreen.Camera
+            is Camera -> NavScreen.Camera(
+                scans = scans
+            )
         }
     }
 }
 
 data class ProcessImageScreenProps(
-    val bitmap: Bitmap,
+    val scans: MutableList<Bitmap>,
     val onNavigate: (ProcessImageNavigation) -> Unit
 )
 
@@ -36,12 +38,12 @@ data class ProcessImageScreenProps(
 fun ProcessImageScreen(props: ProcessImageScreenProps) {
     Box {
         Image(
-            bitmap = props.bitmap.asImageBitmap(),
+            bitmap = props.scans.last().asImageBitmap(),
             contentDescription = "Camera contents"
         )
 
         ProcessImageOverlay(
-            onKeepScanning = { props.onNavigate.invoke(ProcessImageNavigation.CAMERA) },
+            onKeepScanning = { props.onNavigate.invoke(ProcessImageNavigation.Camera(props.scans)) },
             onSaveScan = { /* TODO */ }
         )
     }

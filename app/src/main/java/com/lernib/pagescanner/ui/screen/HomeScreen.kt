@@ -1,5 +1,6 @@
 package com.lernib.pagescanner.ui.screen
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,7 +29,9 @@ enum class HomeNavigation : Navigation {
 
     override fun toNavScreen(): NavScreen {
         return when(this) {
-            CAMERA -> NavScreen.Camera
+            CAMERA -> NavScreen.Camera(
+                scans = mutableListOf()
+            )
         }
     }
 }
@@ -43,7 +46,7 @@ fun HomeScreen(props: HomeScreenProps) {
 
     Column(
         modifier = Modifier
-            .padding(20.dp)
+            .padding(40.dp)
     ) {
         Spacer(modifier = Modifier.weight(1f))
         Row {

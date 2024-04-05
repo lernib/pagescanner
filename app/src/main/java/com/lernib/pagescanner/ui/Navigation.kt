@@ -27,7 +27,7 @@ fun NavigationComposable() {
         NavScreen.Home -> {
             val props = HomeScreenProps(
                 onNavigate = {
-                        next ->
+                    next ->
                     setNavScreen(next.toNavScreen())
                     refreshNavScreen(next.toNavScreen())
                 }
@@ -36,8 +36,9 @@ fun NavigationComposable() {
             HomeScreen(props)
         }
 
-        NavScreen.Camera -> {
+        is NavScreen.Camera -> {
             val props = CameraScreenProps(
+                scans = navScreen.scans,
                 onNavigate = {
                     next ->
                     setNavScreen(next.toNavScreen())
@@ -50,9 +51,9 @@ fun NavigationComposable() {
 
         is NavScreen.ProcessImage -> {
             val props = ProcessImageScreenProps(
-                bitmap = navScreen.bitmap,
+                scans = navScreen.scans,
                 onNavigate = {
-                        next ->
+                    next ->
                     setNavScreen(next.toNavScreen())
                     refreshNavScreen(next.toNavScreen())
                 }
@@ -117,11 +118,17 @@ sealed class NavScreen {
         const val NAVIGATION_CODE: String = "home"
     }
 
-    data object Camera : NavScreen() {
-        const val NAVIGATION_CODE: String = "camera"
+    data class Camera(
+        val scans: MutableList<Bitmap>
+    ) : NavScreen() {
+        companion object {
+            const val NAVIGATION_CODE: String = "camera"
+        }
     }
 
-    data class ProcessImage(val bitmap: Bitmap) : NavScreen() {
+    data class ProcessImage(
+        val scans: MutableList<Bitmap>
+    ) : NavScreen() {
         companion object {
             const val NAVIGATION_CODE: String = "process_image"
         }
@@ -130,7 +137,7 @@ sealed class NavScreen {
     val navigationCode: String
         get() = when(this) {
             Home -> Home.NAVIGATION_CODE
-            Camera -> Camera.NAVIGATION_CODE
+            is Camera -> Camera.NAVIGATION_CODE
             is ProcessImage -> ProcessImage.NAVIGATION_CODE
         }
 }
