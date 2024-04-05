@@ -28,19 +28,21 @@ enum class HomeNavigation : Navigation {
 
     override fun toNavScreen(): NavScreen {
         return when(this) {
-            CAMERA -> NavScreen.Camera(
-                scans = mutableListOf()
-            )
+            CAMERA -> {
+                val props = CameraScreenProps(
+                    scans = mutableListOf()
+                )
+
+                NavScreen.Camera(props)
+            }
         }
     }
 }
 
-data class HomeScreenProps(
-    val onNavigate: (HomeNavigation) -> Unit
-)
-
 @Composable
-fun HomeScreen(props: HomeScreenProps) {
+fun HomeScreen(
+    onNavigate: (HomeNavigation) -> Unit
+) {
     var expanded by remember { mutableStateOf(false) }
 
     Column(
@@ -69,7 +71,7 @@ fun HomeScreen(props: HomeScreenProps) {
                         text = {  Text("Scan") },
                         onClick = {
                             expanded = false
-                            props.onNavigate.invoke(HomeNavigation.CAMERA)
+                            onNavigate.invoke(HomeNavigation.CAMERA)
                         }
                     )
                 }

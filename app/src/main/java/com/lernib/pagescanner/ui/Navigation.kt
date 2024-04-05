@@ -1,6 +1,5 @@
 package com.lernib.pagescanner.ui
 
-import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -8,7 +7,8 @@ import androidx.compose.runtime.remember
 import com.lernib.pagescanner.ui.screen.CameraScreen
 import com.lernib.pagescanner.ui.screen.CameraScreenProps
 import com.lernib.pagescanner.ui.screen.HomeScreen
-import com.lernib.pagescanner.ui.screen.HomeScreenProps
+import com.lernib.pagescanner.ui.screen.ListImagesScreen
+import com.lernib.pagescanner.ui.screen.ListImagesScreenProps
 import com.lernib.pagescanner.ui.screen.ProcessImageScreen
 import com.lernib.pagescanner.ui.screen.ProcessImageScreenProps
 
@@ -23,90 +23,37 @@ fun NavigationComposable() {
         Log.i("lernib", "Navigate to $screenString")
     }
 
+    fun<T: Navigation> onNavigate(navigate: T) {
+        setNavScreen(navigate.toNavScreen())
+        refreshNavScreen(navigate.toNavScreen())
+    }
+
     when(navScreen) {
         NavScreen.Home -> {
-            val props = HomeScreenProps(
-                onNavigate = {
-                    next ->
-                    setNavScreen(next.toNavScreen())
-                    refreshNavScreen(next.toNavScreen())
-                }
-            )
-
-            HomeScreen(props)
+            HomeScreen(onNavigate = { next -> onNavigate(next) })
         }
 
         is NavScreen.Camera -> {
-            val props = CameraScreenProps(
-                scans = navScreen.scans,
-                onNavigate = {
-                    next ->
-                    setNavScreen(next.toNavScreen())
-                    refreshNavScreen(next.toNavScreen())
-                }
+            CameraScreen.Screen(
+                props = navScreen.props,
+                onNavigate = { next -> onNavigate(next) }
             )
-
-            CameraScreen.Screen(props)
         }
 
         is NavScreen.ProcessImage -> {
-            val props = ProcessImageScreenProps(
-                scans = navScreen.scans,
-                onNavigate = {
-                    next ->
-                    setNavScreen(next.toNavScreen())
-                    refreshNavScreen(next.toNavScreen())
-                }
+            ProcessImageScreen(
+                props = navScreen.props,
+                onNavigate = { next -> onNavigate(next) }
             )
+        }
 
-            ProcessImageScreen(props)
+        is NavScreen.ListImages -> {
+            ListImagesScreen(
+                props = navScreen.props,
+                onNavigate = { next -> onNavigate(next) }
+            )
         }
     }
-
-//    NavHost(
-//        navController = navController,
-//        startDestination = "home"
-//    ) {
-//        composable(NavScreen.Home.NAVIGATION_CODE) {
-//            val props = HomeScreenProps(
-//                onNavigate = {
-//                    next ->
-//                    setNavScreen(next.toNavScreen())
-//                    refreshNavScreen(next.toNavScreen())
-//                }
-//            )
-//
-//            HomeScreen(props)
-//        }
-//
-//        composable(NavScreen.Camera.NAVIGATION_CODE) {
-//            val props = CameraScreenProps(
-//                onNavigate = {
-//                    next ->
-//                    setNavScreen(next.toNavScreen())
-//                    refreshNavScreen(next.toNavScreen())
-//                }
-//            )
-//
-//            CameraScreen(props)
-//        }
-//
-//        composable(NavScreen.ProcessImage.NAVIGATION_CODE) {
-//            if (navScreen is NavScreen.ProcessImage) {
-//                val props = ProcessImageScreenProps(
-//                    bitmap = navScreen.bitmap,
-//                    onNavigate = { next ->
-//                        setNavScreen(next.toNavScreen())
-//                        refreshNavScreen(next.toNavScreen())
-//                    }
-//                )
-//
-//                ProcessImageScreen(props)
-//            } else {
-//                Log.e("lernib", "Loading process image without valid navScreen")
-//            }
-//        }
-//    }
 }
 
 interface Navigation {
@@ -118,19 +65,21 @@ sealed class NavScreen {
         const val NAVIGATION_CODE: String = "home"
     }
 
-    data class Camera(
-        val scans: MutableList<Bitmap>
-    ) : NavScreen() {
+    data class Camera(val props: CameraScreenProps) : NavScreen() {
         companion object {
             const val NAVIGATION_CODE: String = "camera"
         }
     }
 
-    data class ProcessImage(
-        val scans: MutableList<Bitmap>
-    ) : NavScreen() {
+    data class ProcessImage(val props: ProcessImageScreenProps) : NavScreen() {
         companion object {
             const val NAVIGATION_CODE: String = "process_image"
+        }
+    }
+
+    data class ListImages(val props: ListImagesScreenProps) : NavScreen() {
+        companion object {
+            const val NAVIGATION_CODE: String = "list_images"
         }
     }
 
@@ -139,5 +88,6 @@ sealed class NavScreen {
             Home -> Home.NAVIGATION_CODE
             is Camera -> Camera.NAVIGATION_CODE
             is ProcessImage -> ProcessImage.NAVIGATION_CODE
+            is ListImages -> ListImages.NAVIGATION_CODE
         }
 }
