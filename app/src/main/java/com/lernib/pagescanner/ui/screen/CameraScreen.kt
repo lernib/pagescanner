@@ -16,8 +16,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeFloatingActionButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -39,10 +43,12 @@ import com.lernib.pagescanner.ui.theme.Purple80
 
 sealed class CameraNavigation : Navigation {
     data class ProcessImage(val props: ProcessImageScreenProps) : CameraNavigation()
+    data class ListImages(val props: ListImagesScreenProps) : CameraNavigation()
 
     override fun toNavScreen(): NavScreen {
         return when(this) {
             is ProcessImage -> NavScreen.ProcessImage(props)
+            is ListImages -> NavScreen.ListImages(props)
         }
     }
 }
@@ -83,9 +89,18 @@ object CameraScreen {
                                 )
                             )
                         )
+                    } else {
+                        Log.i("lernib", "Bitmap is null")
                     }
-
-                    Log.i("lernib", "Bitmap is null")
+                },
+                onListImages = {
+                    onNavigate.invoke(
+                        CameraNavigation.ListImages(
+                            ListImagesScreenProps(
+                                scans = props.scans
+                            )
+                        )
+                    )
                 }
             )
         }
@@ -94,6 +109,7 @@ object CameraScreen {
     @Composable
     fun Interactive(
         onSnap: () -> Unit,
+        onListImages: () -> Unit,
         count: Int
     ) {
         Column(
@@ -123,35 +139,54 @@ object CameraScreen {
                     modifier = Modifier.weight(1f)
                 ) {
                     Spacer(modifier = Modifier.weight(1f))
-
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(15.dp))
-                            .background(color = Purple80)
-                            .aspectRatio(1f)
-                            .padding(20.dp)
-                    ) {
-                        Text(
-                            text = "$count",
-                            textAlign = TextAlign.Center,
-                            fontSize = 25.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black,
+                    
+                    if (count > 0) {
+                        Button(
+                            onClick = onListImages,
+                            shape = RoundedCornerShape(15.dp),
                             modifier = Modifier
-                                .align(Alignment.Center)
-                        )
+                                .aspectRatio(1f)
+                        ) {
+                            CountText(count = count, modifier = Modifier)
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(15.dp))
+                                .background(color = Purple80)
+                                .aspectRatio(1f)
+                                .padding(20.dp)
+                        ) {
+                            CountText(count = count, modifier = Modifier.align(Alignment.Center))
+                        }
                     }
                 }
             }
         }
     }
+
+    @Composable
+    fun CountText(
+        count: Int,
+        modifier: Modifier
+    ) {
+        Text(
+            text = "$count",
+            textAlign = TextAlign.Center,
+            fontSize = 25.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            modifier = modifier
+        )
+    }
 }
 
 @Composable
 @Preview(showBackground = true)
-fun InteractiveStateless() {
+fun InteractivePreview() {
     CameraScreen.Interactive(
         onSnap = {},
+        onListImages = {},
         count = 5
     )
 }

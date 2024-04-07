@@ -48,7 +48,7 @@ fun NavigationComposable() {
         }
 
         is NavScreen.ListImages -> {
-            ListImagesScreen(
+            ListImagesScreen.Screen(
                 props = navScreen.props,
                 onNavigate = { next -> onNavigate(next) }
             )
