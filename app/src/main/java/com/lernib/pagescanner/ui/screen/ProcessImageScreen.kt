@@ -18,11 +18,15 @@ import com.lernib.pagescanner.ui.NavScreen
 import com.lernib.pagescanner.ui.Navigation
 
 sealed class ProcessImageNavigation : Navigation {
-    data class Camera(val props: CameraScreenProps) : ProcessImageNavigation()
+    data class Camera(val props: CameraScreenProps) : ProcessImageNavigation() {
+        override fun toNavScreen(): NavScreen {
+            return NavScreen.Camera(props)
+        }
+    }
 
-    override fun toNavScreen(): NavScreen {
-        return when(this) {
-            is Camera -> NavScreen.Camera(props)
+    data class Save(val props: SaveScreenProps) : ProcessImageNavigation() {
+        override fun toNavScreen(): NavScreen {
+            return NavScreen.Save(props)
         }
     }
 }
@@ -52,7 +56,15 @@ fun ProcessImageScreen(
                     )
                 )
             },
-            onSaveScan = { /* TODO */ }
+            onSaveScan = {
+                onNavigate.invoke(
+                    ProcessImageNavigation.Save(
+                        SaveScreenProps(
+                            scans = props.scans
+                        )
+                    )
+                )
+            }
         )
     }
 }

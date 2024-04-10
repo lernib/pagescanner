@@ -11,6 +11,8 @@ import com.lernib.pagescanner.ui.screen.ListImagesScreen
 import com.lernib.pagescanner.ui.screen.ListImagesScreenProps
 import com.lernib.pagescanner.ui.screen.ProcessImageScreen
 import com.lernib.pagescanner.ui.screen.ProcessImageScreenProps
+import com.lernib.pagescanner.ui.screen.SaveScreen
+import com.lernib.pagescanner.ui.screen.SaveScreenProps
 
 @Composable
 fun NavigationComposable() {
@@ -53,6 +55,13 @@ fun NavigationComposable() {
                 onNavigate = { next -> onNavigate(next) }
             )
         }
+
+        is NavScreen.Save -> {
+            SaveScreen.Screen(
+                navigate = { next -> onNavigate(next) },
+                props = navScreen.props
+            )
+        }
     }
 }
 
@@ -60,34 +69,12 @@ interface Navigation {
     fun toNavScreen(): NavScreen
 }
 
-sealed class NavScreen {
-    data object Home : NavScreen() {
-        const val NAVIGATION_CODE: String = "home"
-    }
-
-    data class Camera(val props: CameraScreenProps) : NavScreen() {
-        companion object {
-            const val NAVIGATION_CODE: String = "camera"
-        }
-    }
-
-    data class ProcessImage(val props: ProcessImageScreenProps) : NavScreen() {
-        companion object {
-            const val NAVIGATION_CODE: String = "process_image"
-        }
-    }
-
-    data class ListImages(val props: ListImagesScreenProps) : NavScreen() {
-        companion object {
-            const val NAVIGATION_CODE: String = "list_images"
-        }
-    }
-
+sealed class NavScreen(
     val navigationCode: String
-        get() = when(this) {
-            Home -> Home.NAVIGATION_CODE
-            is Camera -> Camera.NAVIGATION_CODE
-            is ProcessImage -> ProcessImage.NAVIGATION_CODE
-            is ListImages -> ListImages.NAVIGATION_CODE
-        }
+) {
+    data object Home : NavScreen("home")
+    data class Camera(val props: CameraScreenProps) : NavScreen("camera")
+    data class ProcessImage(val props: ProcessImageScreenProps) : NavScreen("process_image")
+    data class ListImages(val props: ListImagesScreenProps) : NavScreen("list_images")
+    data class Save(val props: SaveScreenProps) : NavScreen("save")
 }

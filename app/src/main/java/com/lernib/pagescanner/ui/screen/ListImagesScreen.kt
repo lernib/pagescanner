@@ -1,6 +1,5 @@
 package com.lernib.pagescanner.ui.screen
 
-import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -40,7 +39,6 @@ data class ListImagesScreenProps(
 )
 
 object ListImagesScreen {
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     fun Screen(
         onNavigate: (ListImagesNavigation) -> Unit,
